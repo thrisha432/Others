@@ -1,0 +1,49 @@
+from flask import Flask, render_template, request, jsonify
+import pyspeedtest
+import threading
+
+app = Flask(__name__)
+
+# Dictionary to store test results temporarily
+results = {}
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/start_speedtest', methods=['POST'])
+def start_speedtest():
+    def run_speedtest():
+        try:
+            print("Starting speed test...")
+            st = pyspeedtest.SpeedTest('10.114.56.189')
+
+            # Perform download speed test
+            print("Testing download speed...")
+            download_speed = st.download() / 1_000_000  # Convert to Mbps
+            print(f"Download speed: {download_speed} Mbps")
+
+            # Perform upload speed test
+            print("Testing upload speed...")
+            upload_speed = st.upload() / 1_000_000  # Convert to Mbps
+            print(f"Upload speed: {upload_speed} Mbps")
+
+            # Update results dictionary
+            results['download_speed'] = download_speed
+            results['upload_speed'] = upload_speed
+
+        except Exception as e:
+            print(f"Error during speed test: {e}")
+
+    # Run speed test in a separate thread
+    threading.Thread(target=run_speedtest).start()
+    return jsonify({'status': 'Speed test started'})
+
+@app.route('/results', methods=['GET'])
+def get_results():
+    return jsonify(results)
+
+if __name__ == '__main__':
+    app.run(host='10.114.56.189', port=5001)
+
+

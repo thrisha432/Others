@@ -1,0 +1,57 @@
+from flask import Flask, render_template, request, jsonify
+import speedtest
+import threading
+
+app = Flask(__name__)
+
+# Dictionary to store test results temporarily
+results = {}
+server_info = {}
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/start_speedtest', methods=['POST'])
+def start_speedtest():
+    def run_speedtest():
+        global results, server_info
+
+        st = speedtest.Speedtest()
+        st.get_best_server()
+
+        # Get server details
+        server = st.get_best_server()
+
+        # Print available keys for debugging
+        print("Server details:", server)
+
+        server_info = {
+            "id": server.get('id', 'N/A'),
+            "name": server.get('name', 'N/A'),
+            "host": server.get('host', 'N/A'),
+            "location": server.get('location', 'N/A'),
+            "country": server.get('country', 'N/A'),
+            "latency": server.get('latency', 'N/A')
+        }
+
+        # Perform speed test
+        print("Testing download speed...")
+        download_speed = st.download() / 1_000_000  # Convert to Mbps
+        print("Testing upload speed...")
+        upload_speed = st.upload() / 1_000_000  # Convert to Mbps
+
+        results['download_speed'] = download_speed
+        results['upload_speed'] = upload_speed
+        results['server_info'] = server_info
+    
+    # Run speed test in a separate thread
+    threading.Thread(target=run_speedtest).start()
+    return jsonify({'status': 'Speed test started'})
+@app.route('/results', methods=['GET'])
+def get_results():
+    return jsonify(results)
+
+if __name__ == '__main__':
+    app.run(host='10.114.56.189', port=5001)
+

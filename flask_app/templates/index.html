@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p {
+            font-size: 18px;
+            color: #333;
+        }
+        #download-speed, #elapsed-time {
+            display: none; /* Hide the elements initially */
+        }
+    </style>
+    <script>
+        let intervalId;
+
+        function startSpeedTest() {
+            fetch('/start_speedtest', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById('download-speed').innerText = 'Download Speed: ' + data.download_speed;
+                        document.getElementById('elapsed-time').innerText = 'Elapsed Time: ' + data.elapsed_time;
+                        document.getElementById('download-speed').style.display = 'block';
+                        document.getElementById('elapsed-time').style.display = 'block';
+                    }
+                });
+            
+            // Clear any existing intervals before starting a new one
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+            // Set the interval to 10 seconds
+            intervalId = setInterval(startSpeedTest, 10000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Speed Test</h1>
+        <button onclick="startSpeedTest()">Start Speed Test</button>
+        <p id="download-speed"></p>
+        <p id="elapsed-time"></p>
+    </div>
+</body>
+</html>

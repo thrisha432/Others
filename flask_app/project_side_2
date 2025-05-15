@@ -1,0 +1,210 @@
+app.py
+
+from flask import Flask, jsonify, render_template, send_file, request
+from ftplib import FTP
+import sqlite3
+from datetime import datetime
+import pytz
+import io
+import traceback
+
+app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024 * 1024  # 4 GB
+
+# FTP server details
+FTP_SERVER = '10.114.58.99'
+FTP_USER = 'emslab'
+FTP_PASS = 'peach1395'
+TEST_FILE_PATH = '/files/test_file.txt'  # Path to test file on the FTP server
+
+# Database path
+DB_PATH = '/var/www/flask_app/speedtest.db'
+
+# Asia/Kolkata timezone
+timezone = pytz.timezone('Asia/Kolkata')
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/get_file_url', methods=['GET'])
+def get_file_url():
+    # Provide the proxy endpoint URL to the client
+    proxy_url = '/download_file'
+    return jsonify({'download_url': proxy_url})
+
+@app.route('/download_file', methods=['GET'])
+def download_file():
+    try:
+        ftp = FTP(FTP_SERVER)
+        ftp.login(FTP_USER, FTP_PASS)
+        file_data = io.BytesIO()
+        ftp.retrbinary(f'RETR {TEST_FILE_PATH}', file_data.write)
+        ftp.quit()
+
+        # Seek to the beginning of the BytesIO buffer
+        file_data.seek(0)
+        return send_file(file_data, as_attachment=True, download_name='downloaded_test.txt')
+
+    except Exception as e:
+        # Log error and return a response
+        app.logger.error("Error during file download: %s", str(e))
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/store_result', methods=['POST'])
+def store_result():
+    import json
+    data = json.loads(request.data)
+    source_ip = FTP_SERVER  # FTP server IP as source
+    dest_ip = request.remote_addr  # Client IP as destination
+    speed = data['speed']
+    file_size_mb = data['file_size_mb']
+    timestamp = data['timestamp']
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        # Create table if it does not exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS speedtest (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_ip TEXT NOT NULL,
+                dest_ip TEXT NOT NULL,
+                speed REAL NOT NULL,
+                file_size TEXT NOT NULL,  -- Storing file size as TEXT to include "MB"
+                timestamp TEXT NOT NULL
+            )
+        ''')
+
+        # Insert data into the table
+        cursor.execute('''
+            INSERT INTO speedtest (source_ip, dest_ip, speed, file_size, timestamp)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (source_ip, dest_ip, speed, f'{file_size_mb} MB', timestamp))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        app.logger.error("Error storing result in database: %s", str(e))
+        return jsonify({'error': str(e)})
+
+if __name__ == '__main__':
+    app.run(host='10.114.56.189', port=5001, debug=True)
+
+
+index.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p {
+            font-size: 18px;
+            color: #333;
+        }
+        #download-speed, #elapsed-time {
+            display: none; /* Hide the elements initially */
+        }
+    </style>
+    <script>
+        async function startSpeedTest() {
+            try {
+                // Get the download URL from the server
+                const response = await fetch('/get_file_url');
+                const data = await response.json();
+                const downloadUrl = data.download_url;
+
+                // Measure download speed
+                const startTime = performance.now();
+
+                // Start the download by navigating to the download URL
+                const anchor = document.createElement('a');
+                anchor.href = downloadUrl;
+                anchor.download = 'downloaded_test.txt';
+                document.body.appendChild(anchor);
+                anchor.click();
+                document.body.removeChild(anchor);
+
+                // Start fetching the file to measure speed without saving it in memory
+                const responseStream = await fetch(downloadUrl);
+                const reader = responseStream.body.getReader();
+                let receivedLength = 0;
+                const chunks = [];
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    receivedLength += value.length;
+                }
+
+                const endTime = performance.now();
+                const elapsedTime = (endTime - startTime) / 1000; // Time in seconds
+                const fileSizeMB = (receivedLength / 1048576).toFixed(2); // File size in MB
+                const speed = (fileSizeMB / elapsedTime).toFixed(2); // Speed in MBps
+
+                document.getElementById('download-speed').innerText = 'Download Speed: ' + speed + ' MBps';
+                document.getElementById('elapsed-time').innerText = 'Elapsed Time: ' + elapsedTime.toFixed(2) + ' seconds';
+                document.getElementById('download-speed').style.display = 'block';
+                document.getElementById('elapsed-time').style.display = 'block';
+
+                // Store the result in the database
+                const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+                await fetch('/store_result', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        speed: speed,
+                        file_size_mb: fileSizeMB,
+                        timestamp: timestamp
+                    })
+                });
+
+            } catch (error) {
+                alert('Error during speed test: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('start-test').addEventListener('click', startSpeedTest);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Speed Test</h1>
+        <button id="start-test">Start Speed Test</button>
+        <p id="download-speed"></p>
+        <p id="elapsed-time"></p>
+    </div>
+</body>
+</html>
