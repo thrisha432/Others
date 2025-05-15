@@ -1,0 +1,64 @@
+GRAFANA CODES 
+
+1. Instantaneous Download Speed (MB/s) Graph (Gauge)
+
+SELECT 
+    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format
+    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)
+    node_ip,
+    'Download_speed_Mbps' AS metric  -- A label for the metric
+FROM 
+    speedtest_results
+WHERE 
+    node_ip IN ('10.32.240.223')
+ORDER BY 
+    time ASC;  -- Grafana expects time-series data in ascending order
+
+2. Live Download Speed Trend (MB/s vs Time) Graph (Time Series- Last 15mins)
+
+SELECT 
+    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format
+    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)
+    node_ip,
+    'Download_speed_Mbps' AS metric  -- A label for the metric
+FROM 
+    speedtest_results
+WHERE 
+    node_ip IN ('10.32.240.223')
+ORDER BY 
+    time ASC;  -- Grafana expects time-series data in ascending order
+
+3. Download Speed Distribution (MB/s) Graph (Pie Chart)
+
+SELECT 
+    CASE  
+        WHEN download_speed_mbps < 1 THEN 'Below 1 MB/s'  
+        WHEN download_speed_mbps BETWEEN 1 AND 2.75 THEN '1 - 2.75 MB/s'  
+        ELSE 'Above 2.75 MB/s'  
+    END AS metric,
+    (COUNT(*) * 100.0) / (SELECT COUNT(*) FROM speedtest_results WHERE node_ip = '10.32.240.223') AS value
+FROM 
+    speedtest_results  
+WHERE 
+    node_ip = '10.32.240.223'  
+GROUP BY 
+    metric
+    
+4. Download Speed Trend (MB/s vs Time) Graph (Time Series- Last 60mins)
+
+SELECT 
+    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format
+    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)
+    node_ip,
+    'Download_speed_Mbps' AS metric  -- A label for the metric
+FROM 
+    speedtest_results
+WHERE 
+    node_ip IN ('10.32.240.223')
+   
+ORDER BY 
+    time ASC;  -- Grafana expects time-series data in ascending order
+
+
+Change Node_IP and database according to nodes or mode of speed test (FTP/HTTP)
+

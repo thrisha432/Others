@@ -1,0 +1,489 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 8,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "Wd5k_ZNHk"
+      },
+      "description": "Displays the current real-time download speed in Megabytes per second (MB/s). This gauge provides an instant snapshot of network performance during an ongoing speed test.\n\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": null
+              },
+              {
+                "color": "#E0B400",
+                "value": 1
+              },
+              {
+                "color": "#37872dfc",
+                "value": 2.75
+              }
+            ]
+          },
+          "unit": "MBs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 9,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "maxDataPoints": 2000,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^value$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {
+          "valueSize": 30
+        }
+      },
+      "pluginVersion": "8.5.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "Wd5k_ZNHk"
+          },
+          "queryText": "SELECT \n    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format\n    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)\n    node_ip,\n    'Download_speed_Mbps' AS metric  -- A label for the metric\nFROM \n    speedtest_results\nWHERE \n    node_ip IN ('10.166.240.70')\nORDER BY \n    time ASC;  -- Grafana expects time-series data in ascending order\n\n\n",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format\n    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)\n    node_ip,\n    'Download_speed_Mbps' AS metric  -- A label for the metric\nFROM \n    speedtest_results\nWHERE \n    node_ip IN ('10.166.240.70')\nORDER BY \n    time ASC;  -- Grafana expects time-series data in ascending order\n\n\n",
+          "refId": "A",
+          "timeColumns": [
+            "time",
+            "ts"
+          ]
+        }
+      ],
+      "title": "Instantaneous Download Speed (MB/s)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "Wd5k_ZNHk"
+      },
+      "description": "Plots real-time download speed against time, tracking speed fluctuations during a test. This panel aids in identifying performance trends and inconsistencies.\n\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "custom": {
+            "axisLabel": "Download Speed (in MB/s)",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 10,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 2.75
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 15,
+        "x": 9,
+        "y": 0
+      },
+      "hideTimeOverride": false,
+      "id": 6,
+      "maxDataPoints": 2000,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "Wd5k_ZNHk"
+          },
+          "queryText": "SELECT \n    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format\n    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)\n    node_ip,\n    'Download_speed_Mbps' AS metric  -- A label for the metric\nFROM \n    speedtest_results\nWHERE \n    node_ip IN ('10.166.240.70')\nORDER BY \n    time ASC;  -- Grafana expects time-series data in ascending order\n",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format\n    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)\n    node_ip,\n    'Download_speed_Mbps' AS metric  -- A label for the metric\nFROM \n    speedtest_results\nWHERE \n    node_ip IN ('10.166.240.70')\nORDER BY \n    time ASC;  -- Grafana expects time-series data in ascending order\n",
+          "refId": "A",
+          "timeColumns": [
+            "time",
+            "ts"
+          ]
+        }
+      ],
+      "timeFrom": "15m",
+      "title": "Live Download Speed Trend (MB/s vs Time)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "Wd5k_ZNHk"
+      },
+      "description": "Categorizes download speeds into three ranges: below 1 MB/s, 1 - 2.75 MB/s, and above 2.75 MB/s. This visualisation helps assess overall network speed consistency.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1 - 2.75 Mbps"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#E0B400",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Above 2.75 Mbps"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Below 1 Mbps"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1 - 2.75 MB/s"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#E0B400",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Above 2.75 MB/s"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Below 1 MB/s"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 0,
+        "y": 6
+      },
+      "id": 10,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom",
+          "values": []
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "Wd5k_ZNHk"
+          },
+          "queryText": "SELECT \n    CASE  \n        WHEN download_speed_mbps < 1 THEN 'Below 1 MB/s'  \n        WHEN download_speed_mbps BETWEEN 1 AND 2.75 THEN '1 - 2.75 MB/s'  \n        ELSE 'Above 2.75 MB/s'  \n    END AS metric,\n    (COUNT(*) * 100.0) / (SELECT COUNT(*) FROM speedtest_results WHERE node_ip = '10.166.240.70') AS value\nFROM \n    speedtest_results  \nWHERE \n    node_ip = '10.166.240.70'  \nGROUP BY \n    metric",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n    CASE  \n        WHEN download_speed_mbps < 1 THEN 'Below 1 MB/s'  \n        WHEN download_speed_mbps BETWEEN 1 AND 2.75 THEN '1 - 2.75 MB/s'  \n        ELSE 'Above 2.75 MB/s'  \n    END AS metric,\n    (COUNT(*) * 100.0) / (SELECT COUNT(*) FROM speedtest_results WHERE node_ip = '10.166.240.70') AS value\nFROM \n    speedtest_results  \nWHERE \n    node_ip = '10.166.240.70'  \nGROUP BY \n    metric",
+          "refId": "A",
+          "timeColumns": [
+            "time",
+            "ts"
+          ]
+        }
+      ],
+      "title": "Download Speed Distribution (MB/s)",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "Wd5k_ZNHk"
+      },
+      "description": "Plots real-time download speed against time, tracking speed fluctuations during a test. This panel aids in identifying performance trends and inconsistencies.\n\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 70,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "hideTimeOverride": false,
+      "id": 12,
+      "interval": "1s",
+      "maxDataPoints": 2000,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "Wd5k_ZNHk"
+          },
+          "queryText": "SELECT \n    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format\n    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)\n    node_ip,\n    'Download_speed_Mbps' AS metric  -- A label for the metric\nFROM \n    speedtest_results\nWHERE \n    node_ip IN ('10.166.240.70')\n   \nORDER BY \n    time ASC;  -- Grafana expects time-series data in ascending order\n",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n    strftime('%Y-%m-%dT%H:%M:%S', timestamp) || '+05:30' AS time,  -- Keep it in IST format\n    download_speed_mbps AS value,  -- The numerical value Grafana will plot (download speed)\n    node_ip,\n    'Download_speed_Mbps' AS metric  -- A label for the metric\nFROM \n    speedtest_results\nWHERE \n    node_ip IN ('10.166.240.70')\n   \nORDER BY \n    time ASC;  -- Grafana expects time-series data in ascending order\n",
+          "refId": "A",
+          "timeColumns": [
+            "time",
+            "ts"
+          ]
+        }
+      ],
+      "timeFrom": "60m",
+      "title": "Download Speed Trend (MB/s vs Time)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2025-02-24T10:44:18.336Z",
+    "to": "2025-02-24T10:45:46.919Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s"
+    ]
+  },
+  "timezone": "browser",
+  "title": "CCE NODE  2(10.166.240.70) HTTP",
+  "uid": "UFPw1qcNz",
+  "version": 32,
+  "weekStart": ""
+}

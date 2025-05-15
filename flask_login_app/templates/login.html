@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Embedded CSS */
+        body {
+            background-color: #e6f4ff; /* Even Lighter Blue Background */
+            color: #333333; /* Dark Text Color for better readability */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #cce7ff; /* Slightly Darker Blue Background */
+            border-radius: 8px;
+            padding: 20px;
+            width: 400px; /* Increased width for container */
+            box-shadow: 0 8px 16px rgba(0, 61, 107, 0.2); /* Shadow effect matching the container background */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        h1 {
+            color: #003d6b; /* Dark Blue Accent */
+            margin-bottom: 20px;
+            font-size: 24px; /* Increased Font Size */
+            text-align: center; /* Center align heading */
+            white-space: nowrap; /* Ensures heading stays on a single line */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #003d6b; /* Dark Blue Color */
+            text-align: left; /* Left-align text labels */
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 22px); /* Adjust width to fit within the container */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #003d6b; /* Dark Blue Border */
+            border-radius: 4px;
+            background-color: #f0f0f0; /* Light Gray Background */
+            color: #003d6b; /* Dark Blue Text Color */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #003d6b; /* Dark Blue Color */
+            text-align: left; /* Align text to the left */
+        }
+
+        .password-toggle input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .password-toggle label {
+            font-size: 14px; /* Reduced font size for the label */
+            margin: 0; /* Remove default margin */
+        }
+
+        button {
+            width: 100%; /* Full width of the container */
+            max-width: 200px; /* Set max-width to keep it rectangular */
+            height: 40px; /* Height of the button */
+            padding: 0; /* Remove padding */
+            border: none;
+            border-radius: 4px;
+            background-color: #003d6b; /* Dark Blue Accent */
+            color: #ffffff; /* White Text Color */
+            font-size: 16px; /* Font size of the button text */
+            cursor: pointer;
+            display: block; /* Ensure button takes full width */
+            margin: 20px auto 0; /* Center align button horizontally and add space above */
+        }
+
+        button:hover {
+            background-color: #002a50; /* Darker Blue Accent */
+        }
+
+        .message {
+            color: #003d6b; /* Dark Blue Color */
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>DIGITS Network Monitoring</h1>
+        <form id="login-form" action="/login" method="POST">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <div class="password-toggle">
+                <input type="checkbox" id="toggle-password">
+                <label for="toggle-password">Show Password</label>
+            </div>
+
+            <button type="submit">LOGIN</button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+    <script>
+        // JavaScript for Password Toggle
+        document.getElementById('toggle-password').addEventListener('change', function() {
+            const passwordField = document.getElementById('password');
+            passwordField.type = this.checked ? 'text' : 'password';
+        });
+
+        // JavaScript to handle server response messages
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const formData = new FormData(this);
+
+            fetch('/login', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'Invalid username') {
+                    document.getElementById('message').textContent = 'Invalid username';
+                } else if (result === 'Invalid password') {
+                    document.getElementById('message').textContent = 'Invalid password';
+                } else {
+                    window.location.href = result; // Redirect to the URL provided by the server
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = 'An error occurred';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Command - curl -X POST http://10.114.56.237:5003/start_http_speedtest -H "Content-Type: application/json" -d '{"url": "http://speedtest.tele2.net/10GB.zip", "duration": 20}'
+
+
+Command - curl -X POST http://10.114.56.237:5003/start_http_speedtest -H "Content-Type: application/json" -d '{"url": "https://nbg1-speed.hetzner.com/100MB.bin", "duration": 10}'
+

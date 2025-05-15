@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f8ff; /* Light Background */
+            color: #003d6b;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: #003d6b; /* Dark Blue */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align items at the top */
+        }
+
+        .sidebar h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 40px; /* Increased margin for more space below */
+            font-size: 20px;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 30px 0; /* Increased margin for larger gaps between sections */
+            display: block;
+            border-radius: 4px;
+        }
+
+        .sidebar a:hover {
+            background-color: #28597a; /* Lighter Blue for Hover */
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #003d6b;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #003d6b;
+        }
+
+        .header button {
+            padding: 10px 20px;
+            background-color: #003d6b;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .header button:hover {
+            background-color: #28597a;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #cce7ff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 61, 107, 0.2);
+            text-align: center;
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #003d6b;
+        }
+
+        .card p {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #003d6b;
+        }
+
+        .card button {
+            padding: 8px 16px;
+            background-color: #003d6b;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background-color: #28597a;
+        }
+
+        /* Speed Test Section */
+        .speed-test-section {
+            margin-top: 20px;
+        }
+
+        .speed-test-section h3 {
+            margin-bottom: 15px;
+            font-size: 22px;
+            color: #003d6b;
+        }
+
+        .speed-test-section label {
+            color: #003d6b;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        
+        .speed-test-options {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 70px; /* Spacing between the select elements */
+            margin-bottom: 15px;
+        }
+
+        .speed-test-section select,
+        .speed-test-section button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .speed-test-section select {
+            background-color: #ffffff;
+            color: #003d6b;
+        }
+
+        .speed-test-section button {
+            background-color: #28597a;
+            color: #ffffff;
+        }
+
+        .speed-test-section button:hover {
+            background-color: #1e4560;
+        }
+
+        /* Results Sections */
+        .results-section {
+            margin-top: 20px;
+        }
+
+        .results-section h4 {
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: #003d6b;
+        }
+
+        .results-section div {
+            padding: 10px;
+            background-color: #cce7ff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 61, 107, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                padding: 10px;
+                text-align: center;
+            }
+
+            .sidebar a {
+                margin: 10px 0;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Dashboard</h2>
+        <a href="#" onclick="showHome()">Home</a>
+        <a href="#" onclick="showSpeedTest()">Speed Test</a>
+        <a href="#" onclick="showHistoricData()">Historic Data</a>
+        <a href="#" onclick="showVisualisation()">Visualisation</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Welcome, {{ username }}</h1>
+            <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid" id="home-section">
+            <div class="card">
+                <h3>Active Nodes</h3>
+                <p>2</p>
+                <button>View Details</button>
+            </div>
+        </div>
+
+        <!-- Speed Test Section -->
+        <div class="speed-test-section" id="speed-test-section">
+            <h3>Speed Test</h3>
+
+            <!-- Node and Interval Selection -->
+            <div class="speed-test-options">
+                <div>
+                    <label for="node-select">Select Node:</label>
+                    <select id="node-select">
+                        <option value="10.114.56.237">Node 1</option>
+                        <option value="10.114.56.248">Node 2</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="interval-select">Select Interval:</label>
+                    <select id="interval-select">
+                        <option value="10000">Default (10s)</option>
+                        <option value="30000">30s</option>
+                        <option value="60000">60s</option>
+                        <option value="90000">90s</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Start and Stop Buttons -->
+            <button id="start-btn">Start</button>
+            <button id="stop-btn">Stop</button>
+
+            <!-- Results for Node 1 -->
+            <div id="results-node1" class="results-section">
+                <h4>Node 1 (10.114.56.237) Results:</h4>
+                <div id="results-node1-content"></div>
+            </div>
+
+            <!-- Results for Node 2 -->
+            <div id="results-node2" class="results-section">
+                <h4>Node 2 (10.114.56.248) Results:</h4>
+                <div id="results-node2-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    // Object to hold intervals for each node
+let intervals = {};
+
+// Add event listener for the Start button
+document.getElementById('start-btn').addEventListener('click', function() {
+    const nodeIp = document.getElementById('node-select').value;
+    const intervalTime = parseInt(document.getElementById('interval-select').value, 10);
+
+    // Clear existing interval if any to avoid multiple intervals on the same node
+    if (intervals[nodeIp]) {
+        clearInterval(intervals[nodeIp]);
+        delete intervals[nodeIp];
+    }
+
+    console.log(`Starting speed test for Node: ${nodeIp} with interval: ${intervalTime} ms`);
+
+    // Start a new speed test for the selected node
+    intervals[nodeIp] = setInterval(() => {
+        fetch(`http://10.114.56.189:5001/start_speedtest`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ node_ip: nodeIp })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            let resultsDiv = document.getElementById(nodeIp === '10.114.56.237' ? 'results-node1-content' : 'results-node2-content');
+            resultsDiv.innerHTML = `
+                <p>Node IP: ${data.client_ip}</p>
+                <p>Download Time: ${data.download_time} seconds</p>
+                <p>File Size: ${data.file_size_mb} MB</p>
+                <p>Download Speed: ${data.download_speed_mbps} MBps</p>
+                <p>FTP Server IP: ${data.ftp_server_ip}</p>
+                <p>Timestamp: ${data.timestamp}</p>
+            `;
+            console.log(`Speed test data received for Node: ${nodeIp}`, data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(`Error: ${error.message}`);
+        });
+    }, intervalTime); // Set according to the selected interval
+});
+
+// Add event listener for the Stop button
+document.getElementById('stop-btn').addEventListener('click', function() {
+    const nodeIp = document.getElementById('node-select').value;
+
+    // Stop the speed test for the selected node
+    if (intervals[nodeIp]) {
+        clearInterval(intervals[nodeIp]);
+        delete intervals[nodeIp]; // Remove the interval from the tracking object
+
+        fetch(`http://10.114.56.189:5001/stop_speedtest`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(`Speed test stopped for Node: ${nodeIp}`, data);
+            let resultsDiv = document.getElementById(nodeIp === '10.114.56.237' ? 'results-node1-content' : 'results-node2-content');
+            resultsDiv.innerHTML += `<p>Speed test stopped for Node: ${nodeIp}</p>`;
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert(`No speed test is running for Node: ${nodeIp}`);
+    }
+});
+    
+     function showHome() {
+            document.getElementById('home-section').style.display = 'grid';
+            document.getElementById('speed-test-section').style.display = 'none';
+            document.getElementById('historic-data-section').style.display = 'none';
+            document.getElementById('visualisation-section').style.display = 'none';
+        }
+
+        function showSpeedTest() {
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('speed-test-section').style.display = 'block';
+            document.getElementById('historic-data-section').style.display = 'none';
+            document.getElementById('visualisation-section').style.display = 'none';
+        }
+
+        function showHistoricData() {
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('speed-test-section').style.display = 'none';
+            document.getElementById('historic-data-section').style.display = 'block';
+            document.getElementById('visualisation-section').style.display = 'none';
+        }
+
+        function showVisualisation() {
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('speed-test-section').style.display = 'none';
+            document.getElementById('historic-data-section').style.display = 'none';
+            document.getElementById('visualisation-section').style.display = 'block';
+        }
+
+        // Set default view
+        showHome();
+    </script>
+</body>
+</html>
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
