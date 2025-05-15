@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+        .dashboard-container h1 {
+            margin-bottom: 30px;
+            color: #2d4e2e;  /* Slightly darker green */
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .dashboard-container p {
+            font-size: 22px;
+            color: #333;  /* Dark text for contrast */
+            font-weight: 500;
+            margin: 15px 0;
+        }
+        .dashboard-container a {
+            font-size: 18px;
+            color: #333;
+            text-decoration: none;
+            margin-top: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #f1f1f1; /* Light background */
+            border: 1px solid #ccc;
+        }
+        .dashboard-container a:hover {
+            background-color: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
+            transform: translateY(-2px); /* Slight hover effect */
+        }
+        .dashboard-container a:active {
+            transform: translateY(1px); /* Button press effect */
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Congratulations <span class="username">{{ username }}</span>, you're logged in successfully!</h1>
+        <a href="{{ url_for('login') }}">Go back to Login</a>
+    </div>
+</body>
+</html>

